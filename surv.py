@@ -9,10 +9,6 @@ import numpy as np
 
 
 
-import os
-os.chdir('C:/Users/z3160256/OneDrive - UNSW/R Data Camp')
-
-
 ### 1. CREATE THE DATASET
 
 # convert iris into a ColumnDataSource >> here I am explicitly assigning the columns from the original data frame
