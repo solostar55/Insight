@@ -7,8 +7,6 @@ from bokeh.io import output_file, show, curdoc
 import pandas as pd
 import numpy as np
 
-from datetime import date
-from random import randint
 
 
 import os
