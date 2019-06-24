@@ -256,7 +256,7 @@ keycols = ['gender','age','bmi','charlson_index','respiratory_rate_shift','heart
 
 patienttabledata = dict(
         feature=keycols,
-        value=np.round(list(surv.loc['!0taoFBFtVU',keycols]),2),
+        value=list(surv.loc['!0taoFBFtVU',keycols]),
     )
 
 patienttablesource = ColumnDataSource(patienttabledata)
