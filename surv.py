@@ -7,6 +7,8 @@ from bokeh.io import output_file, show, curdoc
 import pandas as pd
 import numpy as np
 
+import os
+os.chdir('C:/Users/z3160256/OneDrive - UNSW/R Data Camp')
 
 
 ### 1. CREATE THE DATASET
@@ -17,7 +19,7 @@ import numpy as np
 survivalcurve = pd.read_csv("average_function.csv")
 survivalcurve['Survival'] = np.round((1 - survivalcurve['Survival']),3)*100
 
-surv = pd.read_csv("final_survival_functions.csv")
+surv = pd.read_csv("final_survival_functions_latest.csv")
 surv = surv.set_index("patient_id")
 idx = pd.IndexSlice
 
@@ -27,23 +29,23 @@ survival_source = ColumnDataSource(data={
 }) 
 
 patient_source = ColumnDataSource(data={
-    'Time'       : surv.columns[25:].values,
-    'Survival'       : surv.loc['!6JrxNXasT2'][25:]
+    'Time'       : surv.columns[29:].values,
+    'Survival'       : surv.loc['eCQQYNA7a8U'][29:]
 }) 
 
 
-# Save the minimum and maximum values of the petal length columns
+surv.loc['eCQQYNA7a8U'][29:]
+
+# Save the minimum and maximum values of the time column - should be from 0 to 480
 xmin, xmax = min(survivalcurve['Time']), max(survivalcurve['Time'])
 
-# Save the minimum and maximum values of the sepal_length columns: ymin, ymax
+# Save the minimum and maximum values of the Y axis - probability of sepsis
 ymin, ymax = 0, 100
 
 # 2. Create the figure: plot >> note we added extra commands includimg the range of our X and Y axes, which are the min and max of out X and Y axis variables fertility and life_expectancy
 
 survival_plot = figure(tools=['box_select',
                          'lasso_select',
-                          HoverTool(tooltips=[('probability','@Survival'+"%"),( 'time (h)',  '@Time' )], 
-                                              mode='vline'),
                           'crosshair'],  
                   x_axis_label="Time (hours)",
                   y_axis_label="Probability of sepsis (%)",
@@ -69,20 +71,23 @@ survival_plot.yaxis.axis_label_text_font_style = "normal"
 
 # Plot the graph (scatter plot)
 
-survival_plot.line(x = 'Time', 
+ss1 = survival_plot.line(x = 'Time', 
                 y = 'Survival', 
                 source=survival_source,             
                 line_dash="6 2", line_width=3, color='GoldenRod'
                 )
 
 
-#survival_plot.circle(x = 'Time', 
-#                y = 'Survival',
-#                source=survival_source,
-#                size=20,
-#                fill_color="grey", hover_fill_color="purple",
-#                fill_alpha=0.05, hover_alpha=0.4,
-#                line_color=None, hover_line_color="white")
+ss2 = survival_plot.circle(x = 'Time', 
+                y = 'Survival',
+                source=survival_source,
+                size=20,
+                fill_color="grey", hover_fill_color="purple",
+                fill_alpha=0.05, hover_alpha=0.4,
+                line_color=None, hover_line_color="white")
+
+survival_plot.add_tools(HoverTool(renderers=[ss1], tooltips=[('probability','@Survival'+"%"),('time (h)','@Time')], mode='vline'),
+                       CrosshairTool(line_color='grey'))
 
 
 survival_plot.ygrid.minor_grid_line_color = 'SlateGrey'
@@ -127,6 +132,7 @@ pp2 = patient_plot.line(x = surv.columns[25:].values,
 
 pp3 = patient_plot.add_layout(Arrow(end=NormalHead(fill_color="orange", line_color="Red"), line_color="Red", line_width=4,
                    x_start=50, y_start=30, x_end=100, y_end=50))
+
 patient_plot.add_tools(HoverTool(renderers=[pp1], tooltips=[('probability','@Survival'+"%"),('time (h)',  '@Time')], mode='vline'),
                        CrosshairTool(line_color='grey'))
 
@@ -163,7 +169,7 @@ def update_plot(attr, old, new):
         filt = (surv['gender'].isin(["Male","Female"]))
     new_data = {
         'Time': surv.columns[25:].values,
-        'Survival':surv[(surv['age']>=age_range) & (surv['bmi']>=bmi_value) & (surv['spo2_mean']>=spo2_value) & (surv['charlson_index']>=charlson_value) & (surv['map_mean']>=map_value) & (surv['heart_rate_mean']>=hr_value) & (surv['respiratory_rate_shift']>=resp_value) & (filt)][surv.columns[25:]].mean()
+        'Survival':surv[(surv['age']>=age_range) & (surv['bmi']<=bmi_value) & (surv['spo2_mean']>=spo2_value) & (surv['charlson_index']>=charlson_value) & (surv['map_mean']>=map_value) & (surv['heart_rate_mean']>=hr_value) & (surv['respiratory_rate_shift']>=resp_value) & (filt)][surv.columns[25:]].mean()
     }
     survival_source.data = new_data
     
@@ -174,10 +180,10 @@ ageslider.on_change('value', update_plot)
 charlsonslider = Slider(start=0,end=8,step=1,value=0,title='Charlson Index Score (number of comorbid conditions)')
 charlsonslider.on_change('value', update_plot)
 
-respslider = Slider(start=-22,end=22,step=0.5,value=15,title='How much breathing rate (breaths per min) has changed in the previous 6h')
+respslider = Slider(start=-20,end=20,step=0.5,value=15,title='How much breathing rate (breaths per min) has changed in the previous 6h')
 respslider.on_change('value', update_plot)
 
-hrslider = Slider(start=20,end=150,step=0.5,value=15,title='Average heart rate in the previous 6h (beats per min)')
+hrslider = Slider(start=20,end=120,step=0.5,value=15,title='Average heart rate in the previous 6h (beats per min)')
 hrslider.on_change('value', update_plot)
 
 mapslider = Slider(start=26,end=165,step=0.5,value=80,title='Average mean arterial blood pressure in the previous 6h (beats per min)')
@@ -186,7 +192,7 @@ mapslider.on_change('value', update_plot)
 spo2slider = Slider(start=1,end=100,step=0.5,value=80,title='Average peripheral capillary oxygen saturation in the previous 6h (%)')
 spo2slider.on_change('value', update_plot)
 
-bmislider = Slider(start=10,end=45,step=0.5,value=25,title='BMI')
+bmislider = Slider(start=18,end=45,step=0.5,value=25,title='BMI')
 bmislider.on_change('value', update_plot)
 
 gendermenu = Select(options=['Male','Female','all'],
@@ -218,14 +224,15 @@ def update_patient_plot(attr, old, new):
     
 keycols = ['gender','age','bmi','charlson_index','respiratory_rate_shift','heart_rate_mean','map_mean','spo2_mean'] 
 
-list(surv.loc['!0taoFBFtVU',keycols])
     
 def update_patient_table(attr, old, new):
     updated_data = {
         'feature':keycols,  
-        'value':list(surv.loc[patientselectmenu.value,keycols])
+        'value':[np.round(i,2) if isinstance(i, np.float64) else i for i in list(surv.loc[patientselectmenu.value,keycols])]
     }
     patienttablesource.data = updated_data
+
+#[np.round(i,2) if type(i) == float else i for i in list(surv.loc[patientselectmenu.value,keycols])]
 
 
 patientselectmenu = Select(title="Choose Patient (by ID):", value=patient_ids[0], options=patient_ids)
@@ -244,7 +251,7 @@ keycols = ['gender','age','bmi','charlson_index','respiratory_rate_shift','heart
 
 #patient_data_source = ColumnDataSource(data={
 #    'Feature of patient': features,
-#    'Current value'       : surv.loc['!0taoFBFtVU',keycols]
+#    'Current value'       : surv.loc['eCQQYNA7a8U',keycols]
 #}) 
 
 #columns = [
@@ -255,9 +262,10 @@ keycols = ['gender','age','bmi','charlson_index','respiratory_rate_shift','heart
 
 
 patienttabledata = dict(
-        feature=keycols,
-        value=list(surv.loc['!0taoFBFtVU',keycols]),
+        feature = keycols,
+        value=[np.round(i,2) if isinstance(i, np.float64) else i for i in list(surv.loc['eCQQYNA7a8U',keycols])],
     )
+
 
 patienttablesource = ColumnDataSource(patienttabledata)
 
