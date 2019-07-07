@@ -78,13 +78,13 @@ ss1 = survival_plot.line(x = 'Time',
                 )
 
 
-ss2 = survival_plot.circle(x = 'Time', 
-                y = 'Survival',
-                source=survival_source,
-                size=20,
-                fill_color="grey", hover_fill_color="purple",
-                fill_alpha=0.05, hover_alpha=0.4,
-                line_color=None, hover_line_color="white")
+#ss2 = survival_plot.circle(x = 'Time', 
+#                y = 'Survival',
+#                source=survival_source,
+#                size=20,
+#                fill_color="grey", hover_fill_color="purple",
+#                fill_alpha=0.05, hover_alpha=0.4,
+#                line_color=None, hover_line_color="white")
 
 survival_plot.add_tools(HoverTool(renderers=[ss1], tooltips=[('probability','@Survival'+"%"),('time (h)','@Time')], mode='vline'),
                        CrosshairTool(line_color='grey'))
