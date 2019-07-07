@@ -7,8 +7,8 @@ from bokeh.io import output_file, show, curdoc
 import pandas as pd
 import numpy as np
 
-import os
-os.chdir('C:/Users/z3160256/OneDrive - UNSW/R Data Camp')
+#import os
+#os.chdir('C:/Users/z3160256/OneDrive - UNSW/R Data Camp')
 
 
 ### 1. CREATE THE DATASET
