@@ -227,7 +227,7 @@ keycols = ['gender','age','bmi','charlson_index','respiratory_rate_shift','heart
     
 def update_patient_table(attr, old, new):
     updated_data = {
-        'feature':keycols,  
+        'feature':features,  
         'value':[np.round(i,2) if isinstance(i, np.float64) else i for i in list(surv.loc[patientselectmenu.value,keycols])]
     }
     patienttablesource.data = updated_data
@@ -241,11 +241,11 @@ patientselectmenu.on_change('value', update_patient_plot, update_patient_table)
 
 # Add data table to summarize each patient
 
-features = ['Gender','Age','BMI','Charlson CCI score',
-            'Change in breathing rate (from 6h ago)',
-            'Average heart rate over 6hr (bpm)',
-            'Average mean arterial blood pressure over 6hr',
-            'Average peripheral capillary oxygen saturation over 6hr (%)','']
+features = ['Sex','Age','BMI','Charlson CCI score',
+            'Breathing rate change (cf. 6h ago)',
+            '6hr avg heart rate over (bpm)',
+            '6hr avg mean arterial blood pressure',
+            '6hr avg peripheral capillary O2 saturation','']
 
 keycols = ['gender','age','bmi','charlson_index','respiratory_rate_shift','heart_rate_mean','map_mean','spo2_mean']
 
@@ -262,7 +262,7 @@ keycols = ['gender','age','bmi','charlson_index','respiratory_rate_shift','heart
 
 
 patienttabledata = dict(
-        feature = keycols,
+        feature = features,
         value=[np.round(i,2) if isinstance(i, np.float64) else i for i in list(surv.loc['eCQQYNA7a8U',keycols])],
     )
 
